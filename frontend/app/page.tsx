@@ -1,75 +1,27 @@
-"use client";
-import { Button } from "@/components/ui/button"; 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-
-interface ChatMessage {
-  role: "user" | "model";
-  parts: { text: string }[]; 
-}
+import { Send } from "lucide-react";
 
 export default function Home() {
-  const [error, setError] = useState("");
-  const [value, setValue] = useState("");
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-
-  const getResponse = async () => {
-    if (!value) {
-      setError("Please Enter A Question.");
-      return;
-    }
-
-    try {
-      const options = {
-        method: "POST",
-        body: JSON.stringify({ message: value, history: chatHistory }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-
-      const response = await fetch("http://localhost:5000/gemini", options);
-      const data = await response.text();
-
-      console.log("response", data);
-
-      setChatHistory((oldChatHistory) => [
-        ...oldChatHistory,
-        {
-          role: "user",
-          parts: [{ text: value }],
-        },
-        {
-          role: "model",
-          parts: [{ text: data }], 
-        },
-      ]);
-      setValue("");
-    } catch (error) {
-      console.error("Error fetching response:", error);
-      setError("Something went wrong. Please try again.");
-    }
-  };
-
   return (
-    <div>
-      <p>Ask your idea here</p>
-      <Input
-        className="max-w-md "
-        value={value}
-        placeholder="Enter your text here"
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <Button onClick={getResponse}>Ask</Button>
-      {error && <p className="error">{error}</p>}
+    <div className="flex flex-col h-[85dvh] ">
+      <section className="flex items-center justify-center h-full w-full">
+        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-black dark:text-white">
+          What can I help you with?
+        </h3>
+      </section>
 
-      <div>
-        {chatHistory.map((chatItem, index) => (
-          <div key={index}>
-            <p>{chatItem.role}: {chatItem.parts[0].text}</p>
-          </div>
-        ))}
-      </div>
+      <section className="flex flex-row items-center justify-center mx-auto  w-full bottom-10 mb-10 gap-2 md:gap-5 px-2 md:px-0">
+        <Input
+          className=" w-full md:w-[60%] h-[60px] rounded-xl"
+          height={160}
+          placeholder="Enter your text here"
+          aria-label="Type your prompt here"
+        />
+        <Button variant="outline" className="h-12 w-12">
+          <Send className="w-10 h-10" />
+        </Button>
+      </section>
     </div>
   );
 }
