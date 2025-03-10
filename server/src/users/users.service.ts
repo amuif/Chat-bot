@@ -1,40 +1,99 @@
-import { Injectable } from '@nestjs/common';
+import { LoginUserDto } from './dto/login-user-dto';
+import { sign } from 'jsonwebtoken';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import * as bcrypt from 'bcrypt';
+import { userResponseType } from './types/user-response';
+// import { UserEntity } from './entity/users.entity';
 
 export type User = {
-  _id: string;
+  id: number;
   username: string;
+  email: string;
   password: string;
 };
 
-// export const users: User[] = [
-//   { _id: "1", username: "john_doe", password: "password123" },
-//   { _id: "2", username: "jane_smith", password: "securePass!" },
-//   { _id: "3", username: "alex_brown", password: "alex@789" },
-//   { _id: "4", username: "emily_jones", password: "emilyPass45" },
-//   { _id: "5", username: "michael_white", password: "mike$pass" },
-//   { _id: "6", username: "sarah_clark", password: "sarah2024" },
-//   { _id: "7", username: "david_wilson", password: "david_123" },
-//   { _id: "8", username: "olivia_martin", password: "martin@pass" },
-//   { _id: "9", username: "chris_taylor", password: "taylor!456" },
-//   { _id: "10", username: "sophia_anderson", password: "anderson_007" },
-// ];
 @Injectable()
 export class UsersService {
   constructor(private readonly databaseModule: DatabaseService) {}
 
   // post
   async create(createUserDto: Prisma.UserCreateInput) {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      saltRounds,
+    );
+    createUserDto.password = hashedPassword;
     return this.databaseModule.user.create({ data: createUserDto });
   }
+
+  async loginUser(loginDto: LoginUserDto): Promise<userResponseType> {
+    const user = await this.databaseModule.user.findUnique({
+      where: { email: loginDto.email },
+    });
+
+    if (!user)
+      throw new HttpException(
+        'User not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    const isPasswordCorrect = await bcrypt.compare(
+      loginDto.password,
+      user.password as string,
+    );
+
+    if (!isPasswordCorrect)
+      throw new HttpException(
+        'Incorrect password',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    return this.buildResponseType(user);
+  }
+
+  buildResponseType(User: User): userResponseType {
+    return {
+      id: User.id,
+      username: User.username,
+      email: User.email,
+      token: this.generateJwt(User),
+    };
+  }
+  // generates token
+  generateJwt(user: User): string {
+    return sign({ email: user.email }, process.env.JWT_SECRET as string);
+  }
+
   // get
   async findAll() {
     return this.databaseModule.user.findMany();
   }
   //get (:id)
-  async findOne(id: number) {
-    return this.databaseModule.user.findUnique({ where: { id } });
+  async findOne(username: string) {
+    const user = await this.databaseModule.user.findUnique({
+      where: { username },
+    });
+    if (!user)
+      throw new NotFoundException(`user with ${username} is not found`);
+    return user;
+  }
+  //gets users by their email
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.databaseModule.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    return user;
   }
   //update user
   async update(id: number, updateUserDto: Prisma.UserUpdateInput) {
@@ -47,4 +106,6 @@ export class UsersService {
   async delete(id: number) {
     return this.databaseModule.user.delete({ where: { id } });
   }
+
+  // get's the user then returns it omitting the password( trying to be safe)
 }

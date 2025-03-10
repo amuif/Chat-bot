@@ -3,29 +3,46 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
+  Request
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { User, UsersService } from './users.service';
 import { Prisma } from '@prisma/client';
+import { OmitType } from '@nestjs/mapped-types';
+import { userResponseType } from './types/user-response';
+import { LoginUserDto } from './dto/login-user-dto';
+import { ExpressRequest } from 'src/middleware/auth.middleware';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: Prisma.UserCreateInput) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: Prisma.UserCreateInput) {
+    const user = await this.usersService.create(createUserDto);
+    return this.usersService.buildResponseType(user);
+  }
+
+  @Post('/login')
+  async login(@Body() loginDto: LoginUserDto): Promise<userResponseType> {
+    const user = await this.usersService.loginUser(loginDto);
+    return user;
   }
 
   @Get()
-  finall() {
-    return this.usersService.findAll();
+  async currentUser(@Request() request: ExpressRequest): Promise<userResponseType> {
+    if (!request.user) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    return this.usersService.buildResponseType(request.user);
   }
 
-  @Get(':id')
+  @Get('id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
