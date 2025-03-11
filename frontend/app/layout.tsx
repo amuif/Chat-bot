@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -16,9 +16,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
 export const metadata: Metadata = {
-  title: "Tulip",
-  description: "A simple chat-bot made by Amuif",
+  title: "Axon Chat bot",
+  description:
+    "Axon is a smart and intuitive AI-powered chatbot designed to provide instant, accurate, and engaging conversations. Whether you need quick answers, coding assistance, or general knowledge, Axon is here to help.",
 };
 
 export default function RootLayout({
@@ -27,25 +32,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable}  ${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
         suppressContentEditableWarning
       >
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full">
-              <section className="flex gap-5 m-3">
-                <SidebarTrigger className="top-5 left-5" />
-                <Navbar />
-              </section>{" "}
-              {children}
-            </main>
-          </SidebarProvider>
+          {children}
         </ThemeProvider>{" "}
       </body>
     </html>
   );
 }
+
+//<SidebarProvider>
+//          <AppSidebar />
+//          <main className="w-full">
+//            <section className="flex gap-5 m-3">
+//              <SidebarTrigger className="top-5 left-5" />
+//              <Navbar />
+//            </section>{" "}
+//
+//          </main>
+//        </SidebarProvider>
