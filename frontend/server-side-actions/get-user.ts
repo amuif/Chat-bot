@@ -27,3 +27,16 @@ export const fetchUser = async () => {
   });
   return response.data;
 };
+
+//chat
+export const sendToBot = async (message: string) => {
+  const response = await axios.post(
+    `${API_URL}/api/chat`,
+    { message },
+    {
+      withCredentials: true,
+    }
+  );
+  console.log(response.data.content)
+  return response.data.content;
+};

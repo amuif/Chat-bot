@@ -9,8 +9,10 @@ export class ChatService {
     private readonly databaseModule: DatabaseService,
     private readonly configService: ConfigService,
   ) {}
-  async getResponse(message: string): Promise<string> {
-    console.log(message)
+  async getResponse(input: { message: string } | string): Promise<string> {
+    // Handle both formats:
+    const message = typeof input === 'string' ? input : input.message;
+    console.log(message);
     try {
       const Chat_Api_key = this.configService.get<string>('Chatbot_API');
       const response = await fetch(
@@ -19,25 +21,24 @@ export class ChatService {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${Chat_Api_key}`,
-            'HTTP-Referer': '<YOUR_SITE_URL>', // Optional. Site URL for rankings on openrouter.ai.
-            'X-Title': '<YOUR_SITE_NAME>', // Optional. Site title for rankings on openrouter.ai.
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'deepseek/deepseek-r1-zero:free',
+            model: 'deepseek/deepseek-chat-v3-0324:free',
             messages: [
               {
                 role: 'user',
-                content: "message",
+                content: message,
               },
             ],
           }),
         },
       );
       const res = await response.json();
-      const aiResponse = res?.choices?.[0]?.message?.content;
+      console.log(res);
+      const aiResponse = res?.choices?.[0]?.message;
       // console.log(res?.choices?.[0]?.message);
-      console.log(aiResponse);
+      // console.log(aiResponse);
 
       return aiResponse || 'The server is busy right now. Care to try again?';
     } catch (error) {
