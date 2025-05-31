@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Send, Bot } from "lucide-react";
+import { Send, } from "lucide-react";
 import { sendToBot } from "@/server-side-actions/get-user";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -85,13 +85,13 @@ const LandingComponent = () => {
                     <ReactMarkdown 
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        a: ({node, ...props}) => (
+                        a: ({ ...props}) => (
                           <a {...props} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" />
                         ),
-                        code: ({node, ...props}) => (
+                        code: ({...props}) => (
                           <code {...props} className="bg-gray-100 dark:bg-gray-800 rounded px-1 py-0.5" />
                         ),
-                        pre: ({node, ...props}) => (
+                        pre: ({ ...props}) => (
                           <pre {...props} className="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto" />
                         ),
                       }}
