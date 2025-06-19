@@ -10,10 +10,9 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      "react/react-in-jsx-scope": "off", 
+      "react/react-in-jsx-scope": "on",
     },
   },
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
 ]);
-
