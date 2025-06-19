@@ -1,10 +1,13 @@
-import MainSigningPage from "@/components/signing/main";
+import MainSigningPage from "@/components/login/main";
+import { UserProvider } from "@/context/userContext";
 import React from "react";
 
 const LoginPage = () => {
   return (
     <div>
-      <MainSigningPage />
+      <UserProvider>
+        <MainSigningPage />
+      </UserProvider>
     </div>
   );
 };
