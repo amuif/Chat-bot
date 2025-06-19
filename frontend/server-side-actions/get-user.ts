@@ -11,12 +11,19 @@ export const logingUser = async (credentials: credentialsTypes) => {
   });
   return response.data;
 };
+
 export const signingUser = async (credentials: credentialsTypes) => {
-  const response = await axios.post(`${API_URL}/api/users`, credentials, {
-    withCredentials: true,
-  });
+  const response = await axios.post(
+    `${API_URL}/api/users/signin`,
+    credentials,
+    {
+      withCredentials: true,
+    },
+  );
+
   return response.data;
 };
+
 export const logout = async () => {
   await axios.post(`${API_URL}/api/logout`, {}, { withCredentials: true });
 };
@@ -35,8 +42,8 @@ export const sendToBot = async (message: string) => {
     { message },
     {
       withCredentials: true,
-    }
+    },
   );
-  console.log(response.data.content)
+  console.log(response.data.content);
   return response.data.content;
 };

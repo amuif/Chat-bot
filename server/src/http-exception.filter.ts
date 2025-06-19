@@ -1,4 +1,10 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 @Catch()
@@ -9,17 +15,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
+    let message: string | string[] = 'Internal server error';
 
-    // Handle NestJS HttpExceptions
     if (exception instanceof HttpException) {
       status = exception.getStatus();
-      const responseMessage = exception.getResponse();
-      message = typeof responseMessage === 'string' ? responseMessage : JSON.stringify(responseMessage);
-    }
-
-    // Handle Prisma Unique Constraint Errors (P2002)
-    else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      const res = exception.getResponse();
+      message =
+        typeof res === 'string'
+          ? res
+          : (res as any)?.message || 'Unexpected error';
+    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       if (exception.code === 'P2002') {
         status = HttpStatus.BAD_REQUEST;
         const target = exception.meta?.target || 'resource';

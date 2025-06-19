@@ -1,16 +1,15 @@
 "use client";
 
 import LandingComponent from "@/components/landing";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-const queryClient = new QueryClient();
+import Navbar from "@/components/nav-bar";
+import React from "react"
 
-export default function Home() {
+const Home= () => {
   return (
-    <QueryClientProvider client={queryClient}>
-     
-      <main className="w-full">
-          <LandingComponent />
-        </main>
-    </QueryClientProvider>
+    <div className="h-full w-full">
+      <Navbar />
+      <LandingComponent />
+    </div>
   );
 }
+export default Home

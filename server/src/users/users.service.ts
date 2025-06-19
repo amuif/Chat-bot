@@ -1,6 +1,7 @@
 import { LoginUserDto } from './dto/login-user-dto';
 import { sign } from 'jsonwebtoken';
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -10,7 +11,6 @@ import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import * as bcrypt from 'bcrypt';
 import { userResponseType } from './types/user-response';
-// import { UserEntity } from './entity/users.entity';
 
 export type User = {
   id: number;
@@ -23,13 +23,27 @@ export type User = {
 export class UsersService {
   constructor(private readonly databaseModule: DatabaseService) {}
 
-  // post
   async create(createUserDto: Prisma.UserCreateInput) {
+    const { username, email } = createUserDto;
+    const existingUser = await this.databaseModule.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException(
+        existingUser?.email === email
+          ? 'Email is already taken'
+          : 'username is already taken',
+      );
+    }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       saltRounds,
     );
+
     createUserDto.password = hashedPassword;
     return this.databaseModule.user.create({ data: createUserDto });
   }

@@ -10,17 +10,17 @@ import {
   Post,
   Request
 } from '@nestjs/common';
-import { User, UsersService } from './users.service';
+import {  UsersService } from './users.service';
 import { Prisma } from '@prisma/client';
-import { OmitType } from '@nestjs/mapped-types';
 import { userResponseType } from './types/user-response';
 import { LoginUserDto } from './dto/login-user-dto';
 import { ExpressRequest } from 'src/middleware/auth.middleware';
+
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post("/signin")
   async create(@Body() createUserDto: Prisma.UserCreateInput) {
     const user = await this.usersService.create(createUserDto);
     return this.usersService.buildResponseType(user);

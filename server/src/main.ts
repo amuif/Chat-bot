@@ -8,7 +8,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    // origin: ['http://localhost:3000']
     origin: ['https://gym-7olg.vercel.app', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
