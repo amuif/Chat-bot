@@ -1,4 +1,3 @@
-import { UserProvider } from "@/context/userContext";
 import React from "react";
 
 const LoginLayout = ({
@@ -6,11 +5,7 @@ const LoginLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  return (
-    <div className="w-full px-5 lg:px-0">
-      <UserProvider>{children}</UserProvider>
-    </div>
-  );
+  return <div>{children}</div>;
 };
 
 export default LoginLayout;

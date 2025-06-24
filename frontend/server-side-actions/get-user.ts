@@ -25,7 +25,7 @@ export const signingUser = async (credentials: credentialsTypes) => {
 };
 
 export const logout = async () => {
-  await axios.post(`${API_URL}/api/logout`, {}, { withCredentials: true });
+  await axios.post(`${API_URL}/api/users/logout`, {}, { withCredentials: true });
 };
 
 export const fetchUser = async () => {
@@ -35,7 +35,6 @@ export const fetchUser = async () => {
   return response.data;
 };
 
-//chat
 export const sendToBot = async (message: string) => {
   const response = await axios.post(
     `${API_URL}/api/chat`,

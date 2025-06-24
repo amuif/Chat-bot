@@ -8,9 +8,12 @@ import {
   Param,
   Patch,
   Post,
-  Request
+  Request,
+  Res,
 } from '@nestjs/common';
-import {  UsersService } from './users.service';
+
+import { Response } from 'express';
+import { UsersService } from './users.service';
 import { Prisma } from '@prisma/client';
 import { userResponseType } from './types/user-response';
 import { LoginUserDto } from './dto/login-user-dto';
@@ -20,7 +23,7 @@ import { ExpressRequest } from 'src/middleware/auth.middleware';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post("/signin")
+  @Post('/signin')
   async create(@Body() createUserDto: Prisma.UserCreateInput) {
     const user = await this.usersService.create(createUserDto);
     return this.usersService.buildResponseType(user);
@@ -32,8 +35,15 @@ export class UsersController {
     return user;
   }
 
+  @Post('/logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('access_token');
+    return res.status(200).json({ message: 'Successfully logged out' });
+  }
   @Get()
-  async currentUser(@Request() request: ExpressRequest): Promise<userResponseType> {
+  async currentUser(
+    @Request() request: ExpressRequest,
+  ): Promise<userResponseType> {
     if (!request.user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }

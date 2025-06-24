@@ -12,7 +12,6 @@ export class ChatService {
   async getResponse(input: { message: string } | string): Promise<string> {
     // Handle both formats:
     const message = typeof input === 'string' ? input : input.message;
-    console.log(message);
     try {
       const Chat_Api_key = this.configService.get<string>('Chatbot_API');
       const response = await fetch(
@@ -35,7 +34,6 @@ export class ChatService {
         },
       );
       const res = await response.json();
-      console.log(res);
       const aiResponse = res?.choices?.[0]?.message;
       // console.log(res?.choices?.[0]?.message);
       // console.log(aiResponse);

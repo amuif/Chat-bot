@@ -1,13 +1,12 @@
-import MainSigningPage from "@/components/login/main";
-import { UserProvider } from "@/context/userContext";
+import Login from "@/components/login/login";
 import React from "react";
 
 const LoginPage = () => {
   return (
-    <div>
-      <UserProvider>
-        <MainSigningPage />
-      </UserProvider>
+    <div className="w-full ">
+      <div>
+        <Login />
+      </div>
     </div>
   );
 };
